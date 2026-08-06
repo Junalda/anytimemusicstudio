@@ -1,0 +1,114 @@
+---
+import Icon from './Icon.astro';
+/**
+ * Bottom tab bar (iOS-style). Appears after the visitor moves past
+ * the hero so the House Rules stay the primary first experience.
+ */
+---
+<nav class="tabbar" id="tabbar" aria-label="Primary">
+  <div class="tabbar__inner">
+    <a href="#top" class="tab" data-tab="top">
+      <Icon name="space" size={22} />
+      <span>Home</span>
+    </a>
+    <a href="#how-to" class="tab" data-tab="how-to">
+      <Icon name="book" size={22} />
+      <span>How To</span>
+    </a>
+    <a href="#help" class="tab" data-tab="help">
+      <Icon name="life-ring" size={22} />
+      <span>Help</span>
+    </a>
+  </div>
+</nav>
+
+<style>
+  .tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    padding: 0 max(0.75rem, env(safe-area-inset-left)) max(0.6rem, env(safe-area-inset-bottom));
+    display: flex;
+    justify-content: center;
+    transform: translateY(140%);
+    transition: transform 0.5s var(--ease);
+    pointer-events: none;
+  }
+  .tabbar.is-shown {
+    transform: none;
+    pointer-events: auto;
+  }
+  .tabbar__inner {
+    width: 100%;
+    max-width: 24rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 22px;
+    background: rgba(18, 18, 21, 0.72);
+    border: 1px solid var(--hairline);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.7);
+  }
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.55rem 0.25rem;
+    border-radius: 15px;
+    text-decoration: none;
+    color: var(--text-faint);
+    font-size: 0.72rem;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+    transition: color 0.25s var(--ease), background 0.25s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tab.is-active {
+    color: var(--rose-100);
+    background: rgba(217, 87, 120, 0.12);
+  }
+  .tab:active {
+    transform: scale(0.95);
+  }
+</style>
+
+<script>
+  const tabbar = document.getElementById('tabbar');
+  const hero = document.getElementById('top');
+  const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>('.tab'));
+
+  // Reveal the tab bar once the hero is scrolled past.
+  if (hero && tabbar) {
+    const heroObserver = new IntersectionObserver(
+      ([entry]) => {
+        tabbar.classList.toggle('is-shown', !entry.isIntersecting);
+      },
+      { threshold: 0.35 }
+    );
+    heroObserver.observe(hero);
+  }
+
+  // Highlight the active section.
+  const sections = ['top', 'how-to', 'help']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean) as HTMLElement[];
+
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          tabs.forEach((t) => t.classList.toggle('is-active', t.dataset.tab === id));
+        }
+      });
+    },
+    { rootMargin: '-45% 0px -50% 0px', threshold: 0 }
+  );
+  sections.forEach((s) => sectionObserver.observe(s));
+</script>

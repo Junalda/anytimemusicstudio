@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  icon: string;
+  title: string;
+  subtitle: string;
+  href?: string;
+  target?: string;
+  /** Optional data-action for JS-driven navigation. */
+  action?: string;
+}
+const { icon, title, subtitle, href = '#', target, action } = Astro.props;
+---
+<a
+  class="action card reveal"
+  href={href}
+  target={target}
+  rel={target === '_blank' ? 'noopener' : undefined}
+  data-action={action}
+>
+  <span class="action__icon" aria-hidden="true">
+    <Icon name={icon} size={26} />
+  </span>
+  <span class="action__body">
+    <span class="action__title">{title}</span>
+    <span class="action__sub">{subtitle}</span>
+  </span>
+  <span class="action__chev" aria-hidden="true">
+    <Icon name="chevron" size={20} />
+  </span>
+</a>
+
+<style>
+  .action {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding: 1.4rem 1.35rem;
+    text-decoration: none;
+    color: var(--text);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    transition: transform 0.3s var(--ease), border-color 0.3s var(--ease),
+      box-shadow 0.3s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .action:active {
+    transform: scale(0.98);
+  }
+  @media (hover: hover) {
+    .action:hover {
+      border-color: var(--hairline-strong);
+      box-shadow: var(--shadow-glow);
+    }
+  }
+  .action__icon {
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    color: #1a0308;
+    background: var(--grad-rose);
+    box-shadow: 0 10px 26px -12px rgba(217, 87, 120, 0.7);
+  }
+  .action__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+  }
+  .action__title {
+    font-size: 1.22rem;
+    font-weight: 640;
+    letter-spacing: -0.02em;
+  }
+  .action__sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .action__chev {
+    color: var(--text-faint);
+    transform: rotate(-90deg);
+    transition: transform 0.3s var(--ease), color 0.3s var(--ease);
+  }
+  @media (hover: hover) {
+    .action:hover .action__chev {
+      color: var(--rose-200);
+      transform: rotate(-90deg) translateY(-3px);
+    }
+  }
+</style>

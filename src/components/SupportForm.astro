@@ -1,0 +1,227 @@
+---
+import Icon from './Icon.astro';
+import { studio } from '../config/studio';
+
+/**
+ * SupportForm — "Report an issue".
+ * If PUBLIC_ISSUE_FORM_ENDPOINT is set, the form POSTs there
+ * (multipart, so the optional photo is included). Otherwise it
+ * gracefully falls back to composing a prefilled email / WhatsApp
+ * message so a report is never lost.
+ */
+const endpoint = studio.issueFormEndpoint;
+---
+<details class="report card">
+  <summary class="report__summary">
+    <span class="report__summary-inner">
+      <Icon name="report" size={20} />
+      <span>Report an issue</span>
+    </span>
+    <svg class="report__plus" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </svg>
+  </summary>
+
+  <form
+    class="report__form"
+    id="issue-form"
+    data-endpoint={endpoint}
+    data-email={studio.supportEmail}
+    data-whatsapp={studio.whatsappNumber}
+    {...endpoint ? { method: 'post', action: endpoint, enctype: 'multipart/form-data' } : {}}
+  >
+    <label class="field">
+      <span class="field__label">Name</span>
+      <input type="text" name="name" autocomplete="name" required placeholder="Your name" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">Studio / Room</span>
+      <input type="text" name="room" placeholder="e.g. Studio A" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">What happened?</span>
+      <textarea name="message" rows="4" required placeholder="Describe the problem…"></textarea>
+    </label>
+
+    <label class="field field--file">
+      <span class="field__label">Photo <span class="field__optional">(optional)</span></span>
+      <span class="file-drop" id="file-drop">
+        <Icon name="camera" size={20} />
+        <span id="file-name">Add a photo</span>
+      </span>
+      <input type="file" name="photo" accept="image/*" capture="environment" id="file-input" />
+    </label>
+
+    <button type="submit" class="btn btn--primary">
+      <Icon name="report" size={20} />
+      Submit issue
+    </button>
+    <p class="report__status" id="issue-status" role="status" aria-live="polite"></p>
+  </form>
+</details>
+
+<style>
+  .report {
+    overflow: hidden;
+    padding: 0;
+  }
+  .report__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.15rem 1.2rem;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .report__summary::-webkit-details-marker {
+    display: none;
+  }
+  .report__summary-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--text);
+  }
+  .report__summary-inner :global(svg) {
+    color: var(--rose-300);
+  }
+  .report__plus {
+    color: var(--rose-300);
+    transition: transform 0.3s var(--ease);
+  }
+  .report[open] .report__plus {
+    transform: rotate(135deg);
+  }
+  .report__form {
+    padding: 0 1.2rem 1.35rem;
+    display: grid;
+    gap: 1rem;
+  }
+  .field {
+    display: grid;
+    gap: 0.45rem;
+  }
+  .field__label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: -0.01em;
+  }
+  .field__optional {
+    color: var(--text-faint);
+    font-weight: 400;
+  }
+  .field input[type='text'],
+  .field textarea {
+    width: 100%;
+    font: inherit;
+    color: var(--text);
+    background: var(--bg-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    resize: vertical;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-faint);
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: rgba(246, 179, 199, 0.5);
+    box-shadow: 0 0 0 3px rgba(217, 87, 120, 0.15);
+  }
+  .field--file input[type='file'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .file-drop {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+    border: 1px dashed var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
+  }
+  .field--file:hover .file-drop {
+    border-color: rgba(246, 179, 199, 0.4);
+    color: var(--text);
+  }
+  .report__status {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--rose-200);
+    min-height: 1.2em;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('issue-form') as HTMLFormElement | null;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement | null;
+  const fileName = document.getElementById('file-name');
+  const status = document.getElementById('issue-status');
+
+  fileInput?.addEventListener('change', () => {
+    const f = fileInput.files?.[0];
+    if (fileName) fileName.textContent = f ? f.name : 'Add a photo';
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    const endpoint = form.dataset.endpoint;
+    const data = new FormData(form);
+    const name = String(data.get('name') || '').trim();
+    const room = String(data.get('room') || '').trim();
+    const message = String(data.get('message') || '').trim();
+
+    // No endpoint configured → fall back to a prefilled message so the
+    // report still reaches the studio team. Photos can't ride along a
+    // mailto/WhatsApp link, so we note that.
+    if (!endpoint) {
+      e.preventDefault();
+      const lines = [
+        `Issue report — Anytime Music Studio`,
+        `Name: ${name}`,
+        room ? `Studio / Room: ${room}` : '',
+        `What happened: ${message}`,
+      ].filter(Boolean);
+      const body = lines.join('\n');
+      const whatsapp = form.dataset.whatsapp;
+      if (whatsapp) {
+        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(body)}`, '_blank', 'noopener');
+      } else {
+        const email = form.dataset.email || '';
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent('Studio issue report')}&body=${encodeURIComponent(body)}`;
+      }
+      if (status) status.textContent = 'Opening your messaging app…';
+      return;
+    }
+
+    // Endpoint configured → POST via fetch for inline feedback.
+    e.preventDefault();
+    if (status) status.textContent = 'Sending…';
+    try {
+      const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+      if (res.ok) {
+        form.reset();
+        if (fileName) fileName.textContent = 'Add a photo';
+        if (status) status.textContent = 'Thanks — your report has been sent.';
+      } else {
+        if (status) status.textContent = 'Something went wrong. Please try WhatsApp support.';
+      }
+    } catch {
+      if (status) status.textContent = 'Network error. Please try WhatsApp support.';
+    }
+  });
+</script>

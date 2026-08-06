@@ -1,0 +1,402 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Icon from '../components/Icon.astro';
+import Waveform from '../components/Waveform.astro';
+import HouseRule from '../components/HouseRule.astro';
+import ActionCard from '../components/ActionCard.astro';
+import HowToGuide from '../components/HowToGuide.astro';
+import TroubleshootingItem from '../components/TroubleshootingItem.astro';
+import SupportForm from '../components/SupportForm.astro';
+import WiFiConnect from '../components/WiFiConnect.astro';
+
+import { studio, whatsappLink } from '../config/studio';
+import { houseRules } from '../config/houseRules';
+import { howToGuides } from '../config/howTo';
+import { troubleshooting } from '../config/troubleshooting';
+
+const supportMessage = `Hi ${studio.name} team, I need some help in the studio.`;
+---
+<Base>
+  <!-- ───────────────────────── HERO ───────────────────────── -->
+  <header id="top" class="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+    <div class="wrap hero__inner">
+      <img class="hero__logo" src="/logo-mark.png" width="708" height="309" alt={`${studio.name} logo`} fetchpriority="high" />
+      <h1 class="hero__title">Welcome to<br /><span class="grad-text">Anytime Music Studio.</span></h1>
+      <p class="hero__sub">Create freely. Respect the space.</p>
+      <p class="hero__note">
+        Before you connect to the studio WiFi, please take a moment to read our house rules.
+      </p>
+      <a href="#house-rules" class="hero__scroll">
+        <span>House Rules</span>
+        <span class="hero__scroll-arrow" aria-hidden="true"><Icon name="arrow" size={18} /></span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ─────────────────────── HOUSE RULES ─────────────────── -->
+    <section id="house-rules" class="section">
+      <div class="wrap">
+        <div class="section__head reveal">
+          <p class="eyebrow">House Rules</p>
+          <h2>A few things<br />to keep in mind.</h2>
+          <p class="lead">Simple guidelines that keep the studio great for every artist.</p>
+        </div>
+        <div class="rules">
+          {houseRules.map((rule, i) => <HouseRule {...rule} index={i} />)}
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────── AGREEMENT + WIFI ─────────────────── -->
+    <section id="agreement" class="section section--panel">
+      <div class="wrap">
+        <div class="panel reveal">
+          <div class="panel__glow" aria-hidden="true"></div>
+          <Waveform bars={9} class="panel__wave" />
+          <h2 class="panel__title">All good?<br /><span class="grad-text">Let’s get you connected.</span></h2>
+          <p class="panel__text">
+            By continuing, you confirm that you have read and agree to the
+            Anytime Music Studio House Rules.
+          </p>
+          <WiFiConnect />
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────── STUDIO HUB ───────────────────── -->
+    <section id="hub" class="section">
+      <div class="wrap">
+        <div class="section__head reveal">
+          <p class="eyebrow">Studio Hub</p>
+          <h2>Everything you need<br />for your session.</h2>
+        </div>
+        <div class="hub">
+          <ActionCard
+            icon="book"
+            title="How To"
+            subtitle="Studio guides & instructions"
+            href="#how-to"
+          />
+          <ActionCard
+            icon="life-ring"
+            title="Need help?"
+            subtitle="We’re here if you need us"
+            href="#help"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ──────────────────────── HOW TO ──────────────────────── -->
+    <section id="how-to" class="section">
+      <div class="wrap">
+        <div class="section__head reveal">
+          <p class="eyebrow">How To</p>
+          <h2>Studio guides.</h2>
+          <p class="lead">Tap a topic for step-by-step instructions.</p>
+        </div>
+        <div class="guides">
+          {howToGuides.map((guide) => <HowToGuide guide={guide} />)}
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="section__head section__head--sub reveal">
+          <p class="eyebrow">Troubleshooting</p>
+          <h3 class="subhead">Quick fixes.</h3>
+        </div>
+        <div class="card troubleshoot reveal">
+          {troubleshooting.map((item) => <TroubleshootingItem item={item} />)}
+        </div>
+
+        <div class="still-help reveal">
+          <p>Still need help?</p>
+          <a class="btn btn--ghost" href="#help">
+            <Icon name="life-ring" size={20} />
+            Contact Studio Support
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────── NEED HELP ────────────────────── -->
+    <section id="help" class="section section--help">
+      <div class="wrap">
+        <div class="section__head reveal">
+          <p class="eyebrow">Support</p>
+          <h2>Need a hand?</h2>
+          <p class="lead">
+            If something isn’t working or you need help during your session,
+            contact the Anytime Music Studio team.
+          </p>
+        </div>
+
+        <div class="help-actions reveal">
+          <a class="btn btn--primary" href={whatsappLink(supportMessage)} target="_blank" rel="noopener">
+            <Icon name="whatsapp" size={22} />
+            WhatsApp Studio Support
+          </a>
+        </div>
+
+        <div class="reveal">
+          <SupportForm />
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="wrap">
+        <Waveform bars={5} />
+        <p>{studio.name}</p>
+        <span>Your digital studio assistant</span>
+      </div>
+    </footer>
+  </main>
+
+  <Nav />
+</Base>
+
+<style>
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: calc(env(safe-area-inset-top) + 2rem) 0 4rem;
+    overflow: hidden;
+  }
+  .hero__glow {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    width: 130vw;
+    height: 60vh;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(232, 116, 143, 0.28), transparent 72%);
+    filter: blur(10px);
+    pointer-events: none;
+  }
+  .hero__inner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: hero-in 1s var(--ease) both;
+  }
+  @keyframes hero-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+  .hero__logo {
+    width: clamp(200px, 66vw, 280px);
+    height: auto;
+    margin-bottom: 1.4rem;
+    filter: drop-shadow(0 16px 44px rgba(217, 87, 120, 0.4));
+  }
+  .hero__title {
+    font-size: clamp(2.4rem, 10.5vw, 3.5rem);
+    font-weight: 660;
+  }
+  .hero__sub {
+    margin: 1rem 0 0;
+    font-size: clamp(1.15rem, 5vw, 1.4rem);
+    font-weight: 560;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .hero__note {
+    margin: 1.1rem auto 0;
+    max-width: 24rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  .hero__scroll {
+    margin-top: 2.6rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .hero__scroll-arrow {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--hairline-strong);
+    color: var(--rose-200);
+    animation: bob 1.8s var(--ease-in-out) infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* ── Sections ── */
+  .section {
+    padding: clamp(3.5rem, 12vw, 6rem) 0;
+  }
+  .section__head {
+    margin-bottom: 2rem;
+  }
+  .section__head--sub {
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
+  }
+  .subhead {
+    font-size: clamp(1.5rem, 6vw, 1.9rem);
+    letter-spacing: -0.025em;
+  }
+  .section__head .lead {
+    margin-top: 0.85rem;
+  }
+
+  .rules {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  /* ── Agreement panel ── */
+  .section--panel {
+    padding-top: 1rem;
+  }
+  .panel {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--hairline);
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(217, 87, 120, 0.16), transparent 60%),
+      var(--bg-elevated);
+    padding: clamp(1.75rem, 7vw, 2.75rem) clamp(1.35rem, 6vw, 2.25rem);
+    text-align: center;
+  }
+  .panel__glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 50% at 50% 0%, rgba(232, 116, 143, 0.12), transparent 70%);
+    pointer-events: none;
+  }
+  .panel__wave {
+    position: relative;
+    height: 26px;
+    margin-bottom: 1.25rem;
+  }
+  .panel__title {
+    position: relative;
+    font-size: clamp(1.9rem, 8vw, 2.5rem);
+  }
+  .panel__text {
+    position: relative;
+    margin: 1rem auto 1.9rem;
+    max-width: 26rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Hub ── */
+  .hub {
+    display: grid;
+    gap: 1rem;
+  }
+
+  /* ── How To ── */
+  .guides {
+    display: grid;
+    gap: 0.85rem;
+  }
+  .troubleshoot {
+    padding: 0.2rem 1.2rem;
+  }
+  .still-help {
+    margin-top: 2rem;
+    text-align: center;
+    display: grid;
+    gap: 1rem;
+    justify-items: center;
+  }
+  .still-help p {
+    margin: 0;
+    color: var(--text-muted);
+  }
+  .still-help .btn {
+    width: auto;
+    padding-inline: 1.8rem;
+  }
+
+  /* ── Help ── */
+  .section--help {
+    padding-bottom: 2rem;
+  }
+  .help-actions {
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    padding: 3rem 0 calc(var(--nav-height) + 2.5rem);
+    text-align: center;
+    color: var(--text-faint);
+    border-top: 1px solid var(--hairline);
+  }
+  .footer .wrap {
+    display: grid;
+    gap: 0.6rem;
+    justify-items: center;
+  }
+  .footer p {
+    margin: 0.4rem 0 0;
+    font-weight: 620;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .footer span {
+    font-size: 0.85rem;
+  }
+
+  main {
+    padding-bottom: var(--nav-height);
+  }
+</style>
+
+<script>
+  // Reveal-on-scroll — adds .is-visible as elements enter the viewport.
+  const reveals = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+    );
+    reveals.forEach((el) => io.observe(el));
+  } else {
+    reveals.forEach((el) => el.classList.add('is-visible'));
+  }
+
+  // If rules were already accepted on a previous visit, gently surface
+  // the WiFi panel when the visitor reaches the agreement section —
+  // without ever hiding the House Rules above it.
+  try {
+    if (localStorage.getItem('ams:rules-accepted') === '1') {
+      const panel = document.getElementById('wifi-panel');
+      if (panel) panel.hidden = false;
+    }
+  } catch {}
+</script>

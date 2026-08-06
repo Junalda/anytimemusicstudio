@@ -1,0 +1,59 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  icon: string;
+  title: string;
+  body: string;
+  index?: number;
+}
+const { icon, title, body, index = 0 } = Astro.props;
+---
+<article class="rule card reveal" style={`--d:${(index % 6) * 60}ms`}>
+  <span class="rule__icon" aria-hidden="true">
+    <Icon name={icon} size={22} />
+  </span>
+  <div class="rule__text">
+    <h3>{title}</h3>
+    <p>{body}</p>
+  </div>
+</article>
+
+<style>
+  .rule {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.15rem 1.2rem;
+    transition-delay: var(--d);
+  }
+  .rule__icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    color: var(--rose-200);
+    background: radial-gradient(
+      120% 120% at 30% 20%,
+      rgba(232, 116, 143, 0.22),
+      rgba(232, 116, 143, 0.06)
+    );
+    border: 1px solid rgba(246, 179, 199, 0.18);
+  }
+  .rule__text {
+    min-width: 0;
+  }
+  h3 {
+    font-size: 1.06rem;
+    font-weight: 620;
+    letter-spacing: -0.02em;
+    margin: 0.15rem 0 0.3rem;
+  }
+  p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.96rem;
+    line-height: 1.5;
+  }
+</style>

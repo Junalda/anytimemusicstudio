@@ -1,0 +1,201 @@
+---
+import Icon from './Icon.astro';
+import type { HowToGuideItem } from '../config/howTo';
+interface Props {
+  guide: HowToGuideItem;
+}
+const { guide } = Astro.props;
+---
+<details class="guide card reveal" name="howto">
+  <summary class="guide__summary">
+    <span class="guide__icon" aria-hidden="true">
+      <Icon name={guide.icon} size={22} />
+    </span>
+    <span class="guide__head">
+      <span class="guide__title">{guide.title}</span>
+      <span class="guide__summary-text">{guide.summary}</span>
+    </span>
+    <span class="guide__chev" aria-hidden="true">
+      <Icon name="chevron" size={22} />
+    </span>
+  </summary>
+
+  <div class="guide__body">
+    {
+      guide.blocks.map((block) => {
+        if (block.type === 'text') return <p class="g-text">{block.value}</p>;
+        if (block.type === 'steps')
+          return (
+            <ol class="g-steps">
+              {block.value.map((s) => (
+                <li>{s}</li>
+              ))}
+            </ol>
+          );
+        if (block.type === 'note')
+          return (
+            <p class={`g-note g-note--${block.variant ?? 'tip'}`}>
+              <span class="g-note__label">{block.variant === 'warning' ? 'Important' : 'Tip'}</span>
+              {block.value}
+            </p>
+          );
+        if (block.type === 'image')
+          return <img class="g-image" src={block.src} alt={block.alt} loading="lazy" />;
+        if (block.type === 'video')
+          return (
+            <div class="g-video">
+              <span>{block.title ?? 'Tutorial video'}</span>
+              <a href={block.src} target="_blank" rel="noopener">
+                Open video
+              </a>
+            </div>
+          );
+        return null;
+      })
+    }
+  </div>
+</details>
+
+<style>
+  .guide {
+    overflow: hidden;
+    padding: 0;
+  }
+  .guide__summary {
+    display: flex;
+    align-items: center;
+    gap: 0.95rem;
+    padding: 1.15rem 1.2rem;
+    cursor: pointer;
+    list-style: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .guide__summary::-webkit-details-marker {
+    display: none;
+  }
+  .guide__icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: var(--rose-200);
+    background: radial-gradient(
+      120% 120% at 30% 20%,
+      rgba(232, 116, 143, 0.2),
+      rgba(232, 116, 143, 0.05)
+    );
+    border: 1px solid rgba(246, 179, 199, 0.16);
+  }
+  .guide__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+  }
+  .guide__title {
+    font-size: 1.08rem;
+    font-weight: 620;
+    letter-spacing: -0.02em;
+  }
+  .guide__summary-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+  .guide__chev {
+    color: var(--text-faint);
+    transition: transform 0.35s var(--ease);
+  }
+  .guide[open] .guide__chev {
+    transform: rotate(180deg);
+    color: var(--rose-200);
+  }
+  .guide__body {
+    padding: 0 1.2rem 1.35rem;
+    display: grid;
+    gap: 0.85rem;
+    animation: reveal-body 0.4s var(--ease);
+  }
+  @keyframes reveal-body {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  .g-text {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.98rem;
+  }
+  .g-steps {
+    margin: 0;
+    padding-left: 1.3rem;
+    display: grid;
+    gap: 0.5rem;
+    color: var(--text);
+    font-size: 0.98rem;
+  }
+  .g-steps li {
+    padding-left: 0.2rem;
+  }
+  .g-steps li::marker {
+    color: var(--rose-300);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .g-note {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.93rem;
+    line-height: 1.5;
+    color: var(--text);
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+  }
+  .g-note__label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+  }
+  .g-note--tip {
+    border-color: rgba(246, 179, 199, 0.22);
+  }
+  .g-note--tip .g-note__label {
+    color: var(--rose-300);
+  }
+  .g-note--warning {
+    border-color: rgba(232, 116, 143, 0.4);
+    background: rgba(217, 87, 120, 0.1);
+  }
+  .g-note--warning .g-note__label {
+    color: var(--rose-200);
+  }
+  .g-image {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--hairline);
+    width: 100%;
+  }
+  .g-video {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--hairline-strong);
+    color: var(--text-muted);
+    font-size: 0.93rem;
+  }
+  .g-video a {
+    color: var(--rose-200);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+</style>

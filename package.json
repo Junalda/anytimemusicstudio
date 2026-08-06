@@ -1,0 +1,17 @@
+{
+  "name": "anytime-music-studio",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A small digital studio assistant for Anytime Music Studio — onboarding, house rules, WiFi access and studio guides.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^4.16.18",
+    "qrcode": "^1.5.4"
+  }
+}

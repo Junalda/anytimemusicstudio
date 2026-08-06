@@ -1,0 +1,68 @@
+---
+import type { TroubleshootingEntry } from '../config/troubleshooting';
+interface Props {
+  item: TroubleshootingEntry;
+}
+const { item } = Astro.props;
+---
+<details class="ts">
+  <summary class="ts__summary">
+    <span>{item.question}</span>
+    <svg class="ts__plus" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+    </svg>
+  </summary>
+  <ol class="ts__steps">
+    {item.steps.map((s) => <li>{s}</li>)}
+  </ol>
+</details>
+
+<style>
+  .ts {
+    border-bottom: 1px solid var(--hairline);
+  }
+  .ts:last-child {
+    border-bottom: none;
+  }
+  .ts__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.05rem 0.2rem;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 560;
+    font-size: 1rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .ts__summary::-webkit-details-marker {
+    display: none;
+  }
+  .ts__plus {
+    color: var(--rose-300);
+    flex-shrink: 0;
+    transition: transform 0.3s var(--ease);
+  }
+  .ts[open] .ts__plus {
+    transform: rotate(135deg);
+  }
+  .ts__steps {
+    margin: 0 0 1.1rem;
+    padding-left: 1.3rem;
+    display: grid;
+    gap: 0.45rem;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    animation: reveal-body 0.35s var(--ease);
+  }
+  .ts__steps li::marker {
+    color: var(--rose-300);
+  }
+  @keyframes reveal-body {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+  }
+</style>

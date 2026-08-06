@@ -1,0 +1,51 @@
+---
+/**
+ * Subtle animated equaliser bars — a quiet nod to audio without
+ * cluttering the UI. Purely decorative. Animation respects
+ * prefers-reduced-motion (settles to a static resting state).
+ */
+interface Props {
+  bars?: number;
+  class?: string;
+}
+const { bars = 7, class: klass = '' } = Astro.props;
+const items = Array.from({ length: bars });
+---
+<span class={`wave ${klass}`} aria-hidden="true">
+  {items.map((_, i) => <span style={`--i:${i}`}></span>)}
+</span>
+
+<style>
+  .wave {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+  }
+  .wave span {
+    width: 3px;
+    height: 40%;
+    border-radius: 3px;
+    background: var(--grad-rose);
+    animation: bar 1.5s var(--ease-in-out) infinite;
+    animation-delay: calc(var(--i) * 0.12s);
+    transform-origin: center;
+  }
+  @keyframes bar {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scaleY(1.4);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wave span {
+      animation: none;
+      height: 55%;
+    }
+  }
+</style>

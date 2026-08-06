@@ -1,0 +1,246 @@
+---
+import QRCode from 'qrcode';
+import Icon from './Icon.astro';
+import { studio, wifiQrPayload } from '../config/studio';
+
+/**
+ * WiFiConnect
+ * ───────────
+ * Gates studio WiFi behind the house-rules agreement, then offers the
+ * easiest native join flow available:
+ *
+ *  • A `WIFI:` QR code (generated at BUILD time, server-side). Phone
+ *    cameras on iOS 11+ and Android read this and offer a one-tap join.
+ *  • A "Copy password" fallback for the same device the page is open on
+ *    (the phone can't scan its own screen). The password is base64-
+ *    encoded rather than printed — it is never rendered as plain text.
+ *
+ * The raw password never appears in the HTML as readable text. It only
+ * exists inside the QR image pixels and a base64 blob used by the copy
+ * button. Credentials come from env vars via src/config/studio.ts.
+ */
+
+const payload = wifiQrPayload();
+const qrDataUri = await QRCode.toDataURL(payload, {
+  errorCorrectionLevel: 'M',
+  margin: 1,
+  width: 460,
+  color: { dark: '#0b0b0d', light: '#ffffff' },
+});
+
+// base64 so the password is not human-readable in the DOM / view-source.
+const pwToken = Buffer.from(studio.wifi.password, 'utf-8').toString('base64');
+---
+<div class="wifi" id="wifi">
+  <form class="wifi__agree" id="agree-form">
+    <label class="check">
+      <input type="checkbox" id="agree-checkbox" />
+      <span class="check__box" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="15" height="15">
+          <path d="M4.5 12.5 9.5 17.5 20 6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <span class="check__label">I have read and agree to the House Rules.</span>
+    </label>
+
+    <button type="button" class="btn btn--primary" id="connect-btn" disabled>
+      <Icon name="wifi" size={22} />
+      Connect to WiFi
+    </button>
+  </form>
+
+  <div class="wifi__panel" id="wifi-panel" hidden data-pw={pwToken}>
+    <div class="wifi__qr">
+      <img src={qrDataUri} width="230" height="230" alt={`Scan to join the ${studio.wifi.ssid} WiFi network`} />
+    </div>
+    <p class="wifi__network">
+      <Icon name="wifi" size={16} />
+      <span>{studio.wifi.ssid}</span>
+    </p>
+    <p class="wifi__hint">
+      Point your phone camera at the code and tap the WiFi prompt to join.
+    </p>
+    <button type="button" class="btn btn--ghost" id="copy-pw">
+      <Icon name="lock" size={18} />
+      <span id="copy-pw-label">Copy password</span>
+    </button>
+    <p class="wifi__note">
+      Your password stays hidden — it is copied straight to your clipboard, never shown on screen.
+    </p>
+  </div>
+</div>
+
+<style>
+  .wifi__agree {
+    display: grid;
+    gap: 1.25rem;
+  }
+  .check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 1.05rem 1.15rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .check:has(input:checked) {
+    border-color: rgba(246, 179, 199, 0.4);
+    background: rgba(217, 87, 120, 0.08);
+  }
+  .check input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .check__box {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 1.5px solid var(--hairline-strong);
+    display: grid;
+    place-items: center;
+    color: transparent;
+    background: transparent;
+    transition: all 0.25s var(--ease);
+    margin-top: 1px;
+  }
+  .check input:checked + .check__box {
+    background: var(--grad-rose);
+    border-color: transparent;
+    color: #1a0308;
+  }
+  .check input:focus-visible + .check__box {
+    outline: 2px solid var(--rose-300);
+    outline-offset: 2px;
+  }
+  .check__label {
+    font-size: 1rem;
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .wifi__panel {
+    margin-top: 1.5rem;
+    display: grid;
+    justify-items: center;
+    gap: 0.85rem;
+    text-align: center;
+    animation: wifi-in 0.55s var(--ease);
+  }
+  .wifi__panel[hidden] {
+    display: none;
+  }
+  @keyframes wifi-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.98);
+    }
+  }
+  .wifi__qr {
+    padding: 14px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: var(--shadow-glow);
+    line-height: 0;
+  }
+  .wifi__qr img {
+    border-radius: 8px;
+  }
+  .wifi__network {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.35rem 0 0;
+    font-weight: 620;
+    font-size: 1.05rem;
+    color: var(--rose-100);
+  }
+  .wifi__hint {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    max-width: 22rem;
+  }
+  #copy-pw {
+    width: auto;
+    padding-inline: 1.6rem;
+    margin-top: 0.4rem;
+  }
+  #copy-pw.copied {
+    color: var(--rose-100);
+    border-color: rgba(246, 179, 199, 0.4);
+  }
+  .wifi__note {
+    margin: 0;
+    color: var(--text-faint);
+    font-size: 0.82rem;
+    max-width: 20rem;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('agree-form');
+  const checkbox = document.getElementById('agree-checkbox') as HTMLInputElement | null;
+  const connectBtn = document.getElementById('connect-btn') as HTMLButtonElement | null;
+  const panel = document.getElementById('wifi-panel');
+  const copyBtn = document.getElementById('copy-pw');
+  const copyLabel = document.getElementById('copy-pw-label');
+
+  const STORAGE_KEY = 'ams:rules-accepted';
+
+  function setAccepted(v: boolean) {
+    if (!connectBtn) return;
+    connectBtn.disabled = !v;
+  }
+
+  // Restore prior acceptance so returning visitors aren't re-gated,
+  // while House Rules remain fully accessible on the page.
+  try {
+    if (localStorage.getItem(STORAGE_KEY) === '1' && checkbox) {
+      checkbox.checked = true;
+      setAccepted(true);
+    }
+  } catch {}
+
+  checkbox?.addEventListener('change', () => {
+    setAccepted(checkbox.checked);
+    try {
+      if (checkbox.checked) localStorage.setItem(STORAGE_KEY, '1');
+      else localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  });
+
+  connectBtn?.addEventListener('click', () => {
+    if (!panel) return;
+    panel.hidden = false;
+    document.body.dispatchEvent(new CustomEvent('ams:rules-accepted'));
+    panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  copyBtn?.addEventListener('click', async () => {
+    const token = panel?.dataset.pw ?? '';
+    let password = '';
+    try {
+      password = decodeURIComponent(escape(atob(token)));
+    } catch {
+      password = atob(token);
+    }
+    try {
+      await navigator.clipboard.writeText(password);
+      copyBtn.classList.add('copied');
+      if (copyLabel) copyLabel.textContent = 'Password copied';
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+        if (copyLabel) copyLabel.textContent = 'Copy password';
+      }, 2200);
+    } catch {
+      if (copyLabel) copyLabel.textContent = 'Copy not available';
+    }
+  });
+</script>
