@@ -58,22 +58,35 @@ Secrets are **not** committed. Copy `.env.example` → `.env`:
 
 ## 🔐 How the WiFi flow works
 
-The password is **never printed on the page**. When a visitor accepts the
-house rules and taps **Connect to WiFi**, they get:
+The password is **never printed on the page**. No website can silently
+join a WiFi network — iOS and Android both forbid it — so the app gives
+each device the lowest-friction join it allows, chosen automatically when
+the visitor taps **Connect to WiFi**:
 
-1. **A `WIFI:` QR code**, generated at *build time* from the env
-   credentials. iPhone (iOS 11+) and Android cameras read it and offer a
-   one-tap join — the password lives only inside the QR image's pixels.
-2. **A "Copy password" fallback** for the same phone the page is open on
-   (a phone can't scan its own screen). The password is base64-encoded in
-   the markup and copied straight to the clipboard — never shown on screen.
+- **iPhone / iPad → one-tap install.** Tapping Connect opens an Apple
+  configuration profile (`/anytime-music-wifi.mobileconfig`, generated at
+  build time from the env credentials). The visitor taps **Install** once
+  and iOS joins the network automatically (`AutoJoin`) — no password
+  typing. This is the closest thing to a one-tap join on iOS.
+- **Android / other → native WiFi QR + copy.** A `WIFI:` QR code (also
+  built from the env credentials) that Android's camera reads to offer a
+  one-tap join, plus a **Copy password** button for the same device the
+  page is open on (a phone can't scan its own screen). The password is
+  base64-encoded in the markup and copied straight to the clipboard —
+  never shown on screen.
 
-Because browsers and iOS/Android forbid websites from silently joining
-networks, the QR *is* the closest thing to a native join flow, with the
-clipboard copy as a graceful fallback.
+The QR is shown on every device as a universal backup (e.g. scan it with a
+second phone).
 
 To change the network, edit `WIFI_SSID` / `WIFI_PASSWORD` in `.env` and
-rebuild — the QR regenerates automatically.
+rebuild — the QR **and** the iOS profile regenerate automatically.
+
+> The iOS profile is **unsigned**, so iPhone shows a "Not Verified" label
+> during install (still fully installable). To remove that label, sign the
+> profile with an Apple-issued certificate. The profile necessarily
+> contains the WiFi password, so it — like the QR — is only reachable
+> after the House Rules are accepted; treat it as guest-network material,
+> not a secret.
 
 ---
 
