@@ -427,14 +427,4 @@ const supportMessage = `Hi ${studio.name} team, I need some help in the studio.`
   } else {
     reveals.forEach((el) => el.classList.add('is-visible'));
   }
-
-  // If rules were already accepted on a previous visit, gently surface
-  // the WiFi panel when the visitor reaches the agreement section —
-  // without ever hiding the House Rules above it.
-  try {
-    if (localStorage.getItem('ams:rules-accepted') === '1') {
-      const panel = document.getElementById('wifi-panel');
-      if (panel) panel.hidden = false;
-    }
-  } catch {}
 </script>
