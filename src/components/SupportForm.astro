@@ -4,12 +4,10 @@ import { studio } from '../config/studio';
 
 /**
  * SupportForm — "Report an issue".
- * If PUBLIC_ISSUE_FORM_ENDPOINT is set, the form POSTs there
- * (multipart, so the optional photo is included). Otherwise it
- * gracefully falls back to composing a prefilled email / WhatsApp
- * message so a report is never lost.
+ * On submit, composes the report and opens WhatsApp to the studio
+ * support number with the message prefilled. A photo can't ride along
+ * a WhatsApp link, so the visitor attaches it in the chat if needed.
  */
-const endpoint = studio.issueFormEndpoint;
 ---
 <details class="report card">
   <summary class="report__summary">
@@ -25,10 +23,7 @@ const endpoint = studio.issueFormEndpoint;
   <form
     class="report__form"
     id="issue-form"
-    data-endpoint={endpoint}
-    data-email={studio.supportEmail}
     data-whatsapp={studio.whatsappNumber}
-    {...endpoint ? { method: 'post', action: endpoint, enctype: 'multipart/form-data' } : {}}
   >
     <label class="field">
       <span class="field__label">Name</span>
@@ -178,50 +173,35 @@ const endpoint = studio.issueFormEndpoint;
     if (fileName) fileName.textContent = f ? f.name : 'Add a photo';
   });
 
-  form?.addEventListener('submit', async (e) => {
-    const endpoint = form.dataset.endpoint;
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
     const data = new FormData(form);
     const name = String(data.get('name') || '').trim();
     const room = String(data.get('room') || '').trim();
     const message = String(data.get('message') || '').trim();
+    const hasPhoto = !!(data.get('photo') as File)?.name;
 
-    // No endpoint configured → fall back to a prefilled message so the
-    // report still reaches the studio team. Photos can't ride along a
-    // mailto/WhatsApp link, so we note that.
-    if (!endpoint) {
-      e.preventDefault();
-      const lines = [
-        `Issue report — Anytime Music Studio`,
-        `Name: ${name}`,
-        room ? `Studio / Room: ${room}` : '',
-        `What happened: ${message}`,
-      ].filter(Boolean);
-      const body = lines.join('\n');
-      const whatsapp = form.dataset.whatsapp;
-      if (whatsapp) {
-        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(body)}`, '_blank', 'noopener');
-      } else {
-        const email = form.dataset.email || '';
-        window.location.href = `mailto:${email}?subject=${encodeURIComponent('Studio issue report')}&body=${encodeURIComponent(body)}`;
-      }
-      if (status) status.textContent = 'Opening your messaging app…';
-      return;
-    }
+    // Compose the report and open WhatsApp with it prefilled. A photo
+    // can't be attached through a WhatsApp link, so we prompt the
+    // visitor to add it in the chat.
+    const lines = [
+      `Issue report — Anytime Music Studio`,
+      `Name: ${name}`,
+      room ? `Studio / Room: ${room}` : '',
+      `What happened: ${message}`,
+      hasPhoto ? `(I have a photo to add — will attach it here.)` : '',
+    ].filter(Boolean);
+    const body = lines.join('\n');
+    const whatsapp = form.dataset.whatsapp || '';
 
-    // Endpoint configured → POST via fetch for inline feedback.
-    e.preventDefault();
-    if (status) status.textContent = 'Sending…';
-    try {
-      const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-      if (res.ok) {
-        form.reset();
-        if (fileName) fileName.textContent = 'Add a photo';
-        if (status) status.textContent = 'Thanks — your report has been sent.';
-      } else {
-        if (status) status.textContent = 'Something went wrong. Please try WhatsApp support.';
-      }
-    } catch {
-      if (status) status.textContent = 'Network error. Please try WhatsApp support.';
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(body)}`;
+    const win = window.open(url, '_blank', 'noopener');
+    if (!win) window.location.href = url; // popup blocked → navigate instead
+
+    if (status) {
+      status.textContent = hasPhoto
+        ? 'Opening WhatsApp — don’t forget to attach your photo.'
+        : 'Opening WhatsApp…';
     }
   });
 </script>
