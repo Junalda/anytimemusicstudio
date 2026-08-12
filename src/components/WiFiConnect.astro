@@ -55,16 +55,19 @@ const pwToken = Buffer.from(studio.wifi.password, 'utf-8').toString('base64');
   </form>
 
   <div class="wifi__panel" id="wifi-panel" hidden data-pw={pwToken} data-profile={profileUrl}>
-    <!-- iOS one-tap install path -->
+    <!-- iOS guided install path -->
     <div class="wifi__ios" id="wifi-ios" hidden>
-      <p class="wifi__hint">
-        <strong>Almost there.</strong> Tap install when your iPhone asks,
-        and you’ll join the studio WiFi automatically.
-      </p>
+      <p class="wifi__ios-title"><strong>Join in 3 quick steps</strong></p>
       <a class="btn btn--primary" id="ios-install" href={profileUrl}>
         <Icon name="wifi" size={20} />
         Add WiFi to iPhone
       </a>
+      <ol class="wifi__steps">
+        <li>Tap <b>Allow</b> to download the WiFi profile.</li>
+        <li>Open <b>Settings</b> — tap <b>Profile Downloaded</b> at the top, then <b>Install</b>.</li>
+        <li>Enter your passcode. You’re on the studio WiFi — it connects automatically.</li>
+      </ol>
+      <p class="wifi__ios-note">On iPad, choose <b>this iPad</b> if it asks which device.</p>
       <p class="wifi__or">or scan with another device</p>
     </div>
 
@@ -177,8 +180,57 @@ const pwToken = Buffer.from(studio.wifi.password, 'utf-8').toString('base64');
     padding-inline: 1.7rem;
     text-decoration: none;
   }
-  .wifi__or {
+  .wifi__ios-title {
     margin: 0;
+    font-size: 1.02rem;
+    color: var(--text);
+  }
+  .wifi__steps {
+    counter-reset: step;
+    list-style: none;
+    margin: 0.3rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.65rem;
+    text-align: left;
+    width: 100%;
+    max-width: 23rem;
+  }
+  .wifi__steps li {
+    position: relative;
+    padding-left: 2.4rem;
+    color: var(--text-muted);
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+  .wifi__steps li b {
+    color: var(--text);
+    font-weight: 620;
+  }
+  .wifi__steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 1.6rem;
+    height: 1.6rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--grad-rose);
+    color: #1a0308;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .wifi__ios-note {
+    margin: 0.2rem 0 0;
+    font-size: 0.82rem;
+    color: var(--text-faint);
+    max-width: 22rem;
+  }
+  .wifi__or {
+    margin: 0.3rem 0 0;
     color: var(--text-faint);
     font-size: 0.82rem;
     letter-spacing: 0.02em;
