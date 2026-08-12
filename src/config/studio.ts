@@ -75,7 +75,7 @@ export const studio: StudioConfig = {
   issueFormEndpoint: env.PUBLIC_ISSUE_FORM_ENDPOINT ?? '',
 
   wifi: {
-    ssid: secret('WIFI_SSID') ?? 'TP-Link_34FC_5G',
+    ssid: secret('WIFI_SSID') ?? 'Anytime Music Studio',
     // Real guest WiFi password. A Vercel WIFI_PASSWORD env var still
     // overrides this if set. Note: this repo is public, so treat this as
     // the (already publicly shared) studio guest password, not a secret.
