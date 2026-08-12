@@ -24,6 +24,19 @@ export interface WifiConfig {
   hidden: boolean;
 }
 
+export interface AppConfig {
+  /** Display name of the personal-mixer app. */
+  name: string;
+  /** One short line describing what it does. */
+  tagline: string;
+  /** Path to the app icon in /public. */
+  icon: string;
+  /** Apple App Store link (leave blank until you have it). */
+  appStoreUrl: string;
+  /** Google Play link (leave blank until you have it). */
+  playStoreUrl: string;
+}
+
 export interface StudioConfig {
   name: string;
   headline: string;
@@ -34,6 +47,8 @@ export interface StudioConfig {
   /** Optional POST endpoint for the "Report an issue" form. */
   issueFormEndpoint: string;
   wifi: WifiConfig;
+  /** The personal-monitor mixer app artists install after joining WiFi. */
+  app: AppConfig;
 }
 
 export const studio: StudioConfig = {
@@ -50,6 +65,14 @@ export const studio: StudioConfig = {
     password: env.WIFI_PASSWORD ?? 'change-me',
     encryption: (env.WIFI_ENCRYPTION as WifiConfig['encryption']) ?? 'WPA',
     hidden: (env.WIFI_HIDDEN ?? 'false') === 'true',
+  },
+
+  app: {
+    name: 'MX-Q',
+    tagline: 'Control your personal monitor mix',
+    icon: '/mxq-icon.png',
+    appStoreUrl: env.PUBLIC_APP_IOS_URL ?? '',
+    playStoreUrl: env.PUBLIC_APP_ANDROID_URL ?? '',
   },
 };
 

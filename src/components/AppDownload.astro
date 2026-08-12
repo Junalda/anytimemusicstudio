@@ -1,0 +1,248 @@
+---
+import { studio } from '../config/studio';
+
+/**
+ * AppDownload — "Step 2" of onboarding.
+ *
+ * Placed directly after the WiFi step so the sequence is unmistakable:
+ * first join the studio WiFi, THEN install the MX-Q app to control your
+ * personal monitor mix (the app only works once you're on the network).
+ *
+ * Starts hidden and reveals when WiFiConnect dispatches
+ * `ams:rules-accepted`, so it lands at exactly the right moment. The
+ * store buttons reorder to put the visitor's platform first.
+ */
+const { app } = studio;
+const hasIos = app.appStoreUrl.trim().length > 0;
+const hasAndroid = app.playStoreUrl.trim().length > 0;
+---
+<section class="appstep" id="app-step" hidden aria-labelledby="app-step-title">
+  <div class="appstep__card">
+    <span class="appstep__badge">Step 2</span>
+    <img class="appstep__icon" src={app.icon} width="72" height="72" alt={`${app.name} app icon`} loading="lazy" />
+    <h3 id="app-step-title" class="appstep__title">Get the {app.name} app</h3>
+    <p class="appstep__tagline">{app.tagline}.</p>
+
+    <p class="appstep__wifi">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2.5 9.5a13 13 0 0 1 19 0M6 13a8 8 0 0 1 12 0M9.5 16.5a3 3 0 0 1 5 0" />
+        <circle cx="12" cy="20" r="0.6" fill="currentColor" stroke="none" />
+      </svg>
+      Connect to the studio WiFi first — the app needs it to find your mixer.
+    </p>
+
+    <div class="appstep__stores" id="app-stores">
+      <a
+        class="store"
+        data-store="ios"
+        href={hasIos ? app.appStoreUrl : undefined}
+        aria-disabled={hasIos ? undefined : 'true'}
+        target={hasIos ? '_blank' : undefined}
+        rel={hasIos ? 'noopener' : undefined}
+      >
+        <svg class="store__glyph" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M16.4 12.7c0-2.2 1.8-3.3 1.9-3.3-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.7.8-3.3.8-.7 0-1.7-.8-2.8-.8-1.5 0-2.8.8-3.5 2.2-1.5 2.6-.4 6.5 1.1 8.6.7 1 1.5 2.2 2.6 2.1 1-.04 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.6 1.1-.02 1.8-1 2.5-2 .8-1.2 1.1-2.3 1.1-2.3-.02-.01-2.1-.8-2.1-3.1z" />
+          <path fill="currentColor" d="M14.3 6.3c.6-.7 1-1.7.9-2.7-.9.04-1.9.6-2.5 1.3-.5.6-1 1.6-.9 2.6 1 .07 1.9-.5 2.5-1.2z" />
+        </svg>
+        <span class="store__text">
+          <span class="store__pre">Download on the</span>
+          <span class="store__name">App Store</span>
+        </span>
+      </a>
+
+      <a
+        class="store"
+        data-store="android"
+        href={hasAndroid ? app.playStoreUrl : undefined}
+        aria-disabled={hasAndroid ? undefined : 'true'}
+        target={hasAndroid ? '_blank' : undefined}
+        rel={hasAndroid ? 'noopener' : undefined}
+      >
+        <svg class="store__glyph" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M4.5 3.3 13.2 12l-8.7 8.7c-.3-.2-.5-.6-.5-1.1V4.4c0-.5.2-.9.5-1.1z" opacity="0.75" />
+          <path fill="currentColor" d="M15.4 9.8 17.9 11.3c.9.5.9 1.8 0 2.3l-2.5 1.5L12.9 12l2.5-2.2z" />
+          <path fill="currentColor" d="M4.5 3.3c.3-.2.8-.2 1.2 0l9.7 5.5L12.9 12 4.5 3.3z" opacity="0.9" />
+          <path fill="currentColor" d="M4.5 20.7 12.9 12l2.5 2.2-9.7 5.5c-.4.2-.9.2-1.2 0z" opacity="0.55" />
+        </svg>
+        <span class="store__text">
+          <span class="store__pre">Get it on</span>
+          <span class="store__name">Google Play</span>
+        </span>
+      </a>
+    </div>
+
+    {
+      (!hasIos || !hasAndroid) && (
+        <p class="appstep__soon">Store links will be added here soon.</p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .appstep {
+    margin-top: 1.1rem;
+    animation: app-in 0.55s var(--ease);
+  }
+  .appstep[hidden] {
+    display: none;
+  }
+  @keyframes app-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+  .appstep__card {
+    position: relative;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--hairline);
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(217, 87, 120, 0.14), transparent 60%),
+      var(--bg-elevated);
+    padding: 1.9rem 1.4rem 1.6rem;
+    text-align: center;
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+  }
+  .appstep__badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rose-200);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(217, 87, 120, 0.12);
+    border: 1px solid rgba(246, 179, 199, 0.22);
+  }
+  .appstep__icon {
+    margin-top: 0.6rem;
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.8);
+  }
+  .appstep__title {
+    font-size: 1.4rem;
+    font-weight: 640;
+    letter-spacing: -0.025em;
+    margin: 0.4rem 0 0;
+  }
+  .appstep__tagline {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  .appstep__wifi {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    text-align: left;
+    margin: 0.9rem 0 0.4rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid rgba(246, 179, 199, 0.2);
+    color: var(--text);
+    font-size: 0.9rem;
+    line-height: 1.45;
+    max-width: 24rem;
+  }
+  .appstep__wifi svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--rose-200);
+  }
+  .appstep__stores {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 0.8rem;
+    width: 100%;
+  }
+  .store {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 14px;
+    background: #101013;
+    border: 1px solid var(--hairline-strong);
+    color: var(--text);
+    text-decoration: none;
+    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .store:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) {
+    .store:hover {
+      border-color: rgba(246, 179, 199, 0.4);
+    }
+  }
+  .store[aria-disabled='true'] {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .store__glyph {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    color: #fff;
+  }
+  .store__text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.1;
+  }
+  .store__pre {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+  .store__name {
+    font-size: 1rem;
+    font-weight: 620;
+    letter-spacing: -0.01em;
+  }
+  /* Emphasise the visitor's own platform. */
+  .appstep__stores[data-platform='ios'] .store[data-store='ios'],
+  .appstep__stores[data-platform='android'] .store[data-store='android'] {
+    order: -1;
+    border-color: rgba(246, 179, 199, 0.5);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  }
+  .appstep__soon {
+    margin: 0.6rem 0 0;
+    font-size: 0.8rem;
+    color: var(--text-faint);
+  }
+</style>
+
+<script>
+  const step = document.getElementById('app-step');
+  const stores = document.getElementById('app-stores');
+
+  // Put the visitor's platform store first / highlighted.
+  const ua = navigator.userAgent || '';
+  const isIOS =
+    /iPad|iPhone|iPod/.test(ua) ||
+    ((navigator as any).platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/.test(ua);
+  if (stores) stores.dataset.platform = isIOS ? 'ios' : isAndroid ? 'android' : '';
+
+  // Reveal at the moment WiFi is offered (Connect tapped, or returning
+  // visitor who already accepted the rules).
+  function reveal() {
+    if (step) step.hidden = false;
+  }
+  document.body.addEventListener('ams:rules-accepted', reveal);
+  try {
+    if (localStorage.getItem('ams:rules-accepted') === '1') reveal();
+  } catch {}
+</script>

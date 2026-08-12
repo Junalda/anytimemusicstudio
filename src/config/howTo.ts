@@ -38,6 +38,12 @@ export const howToGuides: HowToGuideItem[] = [
     summary: 'Set up and adjust your own monitor mix.',
     blocks: [
       {
+        type: 'note',
+        value:
+          'First connect to the studio WiFi, then install the MX-Q app — it’s what you use to control your personal mix. You need to be on the studio network for the app to find your mixer.',
+        variant: 'tip',
+      },
+      {
         type: 'text',
         value:
           'The personal monitoring system lets each musician build their own mix — more of yourself, less of everything else, without affecting anyone else.',

@@ -9,6 +9,7 @@ import HowToGuide from '../components/HowToGuide.astro';
 import TroubleshootingItem from '../components/TroubleshootingItem.astro';
 import SupportForm from '../components/SupportForm.astro';
 import WiFiConnect from '../components/WiFiConnect.astro';
+import AppDownload from '../components/AppDownload.astro';
 
 import { studio, whatsappLink } from '../config/studio';
 import { houseRules } from '../config/houseRules';
@@ -61,8 +62,14 @@ const supportMessage = `Hi ${studio.name} team, I need some help in the studio.`
             By continuing, you confirm that you have read and agree to the
             Anytime Music Studio House Rules.
           </p>
+          <p class="panel__steps" aria-hidden="true">
+            <span><span class="panel__step-n">1</span> Connect to WiFi</span>
+            <span class="panel__step-arrow">→</span>
+            <span><span class="panel__step-n">2</span> Get the {studio.app.name} app</span>
+          </p>
           <WiFiConnect />
         </div>
+        <AppDownload />
       </div>
     </section>
 
@@ -300,9 +307,40 @@ const supportMessage = `Hi ${studio.name} team, I need some help in the studio.`
   }
   .panel__text {
     position: relative;
-    margin: 1rem auto 1.9rem;
+    margin: 1rem auto 1.2rem;
     max-width: 26rem;
     color: var(--text-muted);
+  }
+  .panel__steps {
+    position: relative;
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem 0.75rem;
+    margin: 0 auto 1.9rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    font-size: 0.86rem;
+    font-weight: 560;
+    color: var(--text);
+  }
+  .panel__step-n {
+    display: inline-grid;
+    place-items: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 0.35rem;
+    border-radius: 50%;
+    background: var(--grad-rose);
+    color: #1a0308;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+  .panel__step-arrow {
+    color: var(--rose-300);
   }
 
   /* ── Hub ── */
