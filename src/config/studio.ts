@@ -13,6 +13,20 @@
 
 const env = import.meta.env;
 
+/**
+ * Read a secret build-time variable. Works both locally (loaded from
+ * `.env` into import.meta.env) and on hosts like Vercel where the value
+ * is injected via process.env from the project's environment settings.
+ * Only referenced in server-side frontmatter, so it never reaches the
+ * client bundle.
+ */
+function secret(key: 'WIFI_SSID' | 'WIFI_PASSWORD' | 'WIFI_ENCRYPTION' | 'WIFI_HIDDEN'): string | undefined {
+  const fromVite = (env as Record<string, string | undefined>)[key];
+  if (fromVite != null) return fromVite;
+  const proc = (globalThis as any).process;
+  return proc?.env?.[key];
+}
+
 export interface WifiConfig {
   /** Network name (SSID). */
   ssid: string;
@@ -56,22 +70,22 @@ export const studio: StudioConfig = {
   headline: 'Welcome to Anytime Music Studio.',
   subheadline: 'Create freely. Respect the space.',
 
-  whatsappNumber: env.PUBLIC_WHATSAPP_NUMBER ?? '31612345678',
-  supportEmail: env.PUBLIC_SUPPORT_EMAIL ?? 'hello@anytimemusic.studio',
+  whatsappNumber: env.PUBLIC_WHATSAPP_NUMBER ?? '31643187444',
+  supportEmail: env.PUBLIC_SUPPORT_EMAIL ?? 'management@infntyhub.com',
   issueFormEndpoint: env.PUBLIC_ISSUE_FORM_ENDPOINT ?? '',
 
   wifi: {
-    ssid: env.WIFI_SSID ?? 'Anytime Music Studio',
-    password: env.WIFI_PASSWORD ?? 'change-me',
-    encryption: (env.WIFI_ENCRYPTION as WifiConfig['encryption']) ?? 'WPA',
-    hidden: (env.WIFI_HIDDEN ?? 'false') === 'true',
+    ssid: secret('WIFI_SSID') ?? 'TP-Link_34FC_5G',
+    password: secret('WIFI_PASSWORD') ?? 'change-me',
+    encryption: (secret('WIFI_ENCRYPTION') as WifiConfig['encryption']) ?? 'WPA',
+    hidden: (secret('WIFI_HIDDEN') ?? 'false') === 'true',
   },
 
   app: {
     name: 'MX-Q',
     tagline: 'Control your personal monitor mix',
     icon: '/mxq-icon.png',
-    appStoreUrl: env.PUBLIC_APP_IOS_URL ?? '',
+    appStoreUrl: env.PUBLIC_APP_IOS_URL ?? 'https://apps.apple.com/nl/app/mx-q/id1471505954',
     playStoreUrl: env.PUBLIC_APP_ANDROID_URL ?? '',
   },
 };
