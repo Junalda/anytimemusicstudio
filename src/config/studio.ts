@@ -76,7 +76,10 @@ export const studio: StudioConfig = {
 
   wifi: {
     ssid: secret('WIFI_SSID') ?? 'TP-Link_34FC_5G',
-    password: secret('WIFI_PASSWORD') ?? 'change-me',
+    // Real guest WiFi password. A Vercel WIFI_PASSWORD env var still
+    // overrides this if set. Note: this repo is public, so treat this as
+    // the (already publicly shared) studio guest password, not a secret.
+    password: secret('WIFI_PASSWORD') ?? 'Artiest2026@@',
     encryption: (secret('WIFI_ENCRYPTION') as WifiConfig['encryption']) ?? 'WPA',
     hidden: (secret('WIFI_HIDDEN') ?? 'false') === 'true',
   },
